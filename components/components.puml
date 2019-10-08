@@ -33,7 +33,8 @@ interface " " as ICPCM
 interface "Dev API" as ICLiAD
 interface "Supplier API" as ICMAS
 interface "App User API" as ICLaAU
-interface "Cluster API" as ICC
+interface "Cluster API" as ICCCM
+interface "Cluster CLI" as ICCAS
 
 artifact "Application" as ArApp <<artifact>>
 
@@ -54,8 +55,11 @@ ICMCLa -do- CM
 
 CM -do- ICMAC
 ICMAC )-do- CC
-CM -do-( ICC
-ICC -do- CC
+CM -do-( ICCCM
+ICCCM -do- CC
+
+CC -ri- ICCAS
+ICCAS )-ri- AS
 
 CLi .do.> ArApp : <<create>>
 CM .up.> ArApp : <<use>>
