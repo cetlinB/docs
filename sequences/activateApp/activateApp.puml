@@ -9,7 +9,7 @@ participant ":Payments" as CP
 
 AU -> CLa : GET /launcher/applications/{id}
 activate CLa
-CLa --> AU : 200 ComputationApplication
+CLa -->> AU : 200 ComputationApplication
 deactivate CLa
 
 AU -> CLa : POST /launcher/computations (json)
@@ -25,7 +25,7 @@ deactivate CP
 CM ->> CC : POST /cluster/computations (json)
 activate CC
 
-CM -> CLa : 201 id
+CM -->> CLa : 201 id
 deactivate CM
 
 CLa -->> AU : 201 id
