@@ -6,14 +6,14 @@ participant ":Cluster" as CC
 
 AS -> CM : POST /machine-manager/machines (json)
 activate CM
-CM --> AS : 201 {id, :List<Key>}
+CM -->> AS : 201 {id, :List<Key>}
 deactivate CM
 
 AS ->> CC : run(:Key)
 activate CC
 CC -> CM : PATCH /machine-manager/{id} (json)
 activate CM
-CM --> CC : 200
+CM -->> CC : 200
 deactivate CM
 
 ref over CC, CM : healthchecking

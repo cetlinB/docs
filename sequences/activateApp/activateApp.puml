@@ -18,33 +18,51 @@ CLa -> CM : POST /machine-manager/computations (json)
 activate CM
 
 CM -> CP : POST /payments/computations/{id} (json)
-CP --> CM : 201
+activate CP
+CP -->> CM : 201
+deactivate CP
 
 CM ->> CC : POST /cluster/computations (json)
 activate CC
 
 CM -> CLa : 201 id
 deactivate CM
-CLa --> AU : 201 id
+
+CLa -->> AU : 201 id
 deactivate CLa
 
 loop
 
+activate CM
 CM -> CC : GET /cluster/status/computation
-CC --> CM : List<ComputationInfo>
+activate CC
+CC -->> CM : List<ComputationInfo>
+deactivate CC
 
 CM -> CP : PATCH /payments/computations/{id} (json)
-CP --> CM : 200
+activate CP
+CP -->> CM : 200
+deactivate CP
 
-break over finished computing
+deactivate CM
+
+break finished computing
 CC ->> CM : PUT /machine-manager/computations/{id} (json)
+activate CM
+
 end break
 end loop
 
-CM ->> CP : PATCH /payments/computation/{id} (json)
-CC ->> CLo : POST /logger/computations/{id} (json)
-deactivate CC
+CM -> CP : PATCH /payments/computation/{id} (json)
+activate CP
+CP -->> CM : 201
+deactivate CP
+deactivate CM
+
+CC -> CLo : POST /logger/computations/{id} (json)
 activate CLo
+CLo -->> CC : 201
 deactivate CLo
+deactivate CC
 
 @enduml
