@@ -31,7 +31,14 @@ deactivate CM
 CLa -->> AU : 201 id
 deactivate CLa
 
+CC -> CLo : POST /logger/computations/{id} (json)
+activate CLo
+CLo -->> CC : 201
+deactivate CLo
+
 loop
+
+par
 
 activate CM
 CM -> CC : GET /cluster/status/computation
@@ -46,6 +53,15 @@ deactivate CP
 
 deactivate CM
 
+else
+
+CC -> CLo : PATCH /logger/computations/{id} (json)
+activate CLo
+CLo -->> CC : 200
+deactivate CLo
+
+end par
+
 break finished computing
 CC ->> CM : PUT /machine-manager/computations/{id} (json)
 activate CM
@@ -59,10 +75,12 @@ CP -->> CM : 201
 deactivate CP
 deactivate CM
 
-CC -> CLo : POST /logger/computations/{id} (json)
+CC -> CLo : PUT /logger/computations/{id} (json)
 activate CLo
-CLo -->> CC : 201
+CLo -->> CC : 200
 deactivate CLo
+
+
 deactivate CC
 
 @enduml
