@@ -59,7 +59,7 @@ CM -do-( ICCCM
 ICCCM -do- CC
 
 CC -ri- ICCAS
-ICCAS )-ri- AS
+ICCAS <-ri- AS
 
 CLi .do.> ArApp : <<create>>
 CM .up.> ArApp : <<use>>
