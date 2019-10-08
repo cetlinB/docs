@@ -1,0 +1,31 @@
+@startuml
+
+actor "App User" as AU
+participant ":Launcher" as CLa
+participant ":Machine Manager" as CM
+participant ":Cluster" as CC
+participant ":Logger" as CLo
+
+AU -> CLa : GET /launcher/applications/{id}
+activate CLa
+CLa --> AU : 200 ComputationApplication
+deactivate CLa
+
+AU -> CLa : POST /launcher/computations (json)
+activate CLa
+CLa -> CM : POST /machine-manager/computations (json)
+activate CM
+CM --> CC : POST /cluster/computations (json)
+activate CC
+
+CM --> CLa : 201 id
+deactivate CM
+CLa --> AU : 201 id
+deactivate CLa
+
+CC --> CLo : POST /logger/computations/{id} (json)
+deactivate CC
+activate CLo
+deactivate CLo
+
+@enduml
