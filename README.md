@@ -1,2 +1,3 @@
 # docs
-Documentation for project
+
+[Link to Wiki](https://github.com/Plan-B-PO/docs/wiki)
