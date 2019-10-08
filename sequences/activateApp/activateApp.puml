@@ -5,6 +5,7 @@ participant ":Launcher" as CLa
 participant ":Machine Manager" as CM
 participant ":Cluster" as CC
 participant ":Logger" as CLo
+participant ":Payments" as CP
 
 AU -> CLa : GET /launcher/applications/{id}
 activate CLa
@@ -15,15 +16,33 @@ AU -> CLa : POST /launcher/computations (json)
 activate CLa
 CLa -> CM : POST /machine-manager/computations (json)
 activate CM
-CM --> CC : POST /cluster/computations (json)
+
+CM -> CP : POST /payments/computations/{id} (json)
+CP --> CM : 201
+
+CM ->> CC : POST /cluster/computations (json)
 activate CC
 
-CM --> CLa : 201 id
+CM -> CLa : 201 id
 deactivate CM
 CLa --> AU : 201 id
 deactivate CLa
 
-CC --> CLo : POST /logger/computations/{id} (json)
+loop
+
+CM -> CC : GET /cluster/status/computation
+CC --> CM : List<ComputationInfo>
+
+CM -> CP : PATCH /payments/computations/{id} (json)
+CP --> CM : 200
+
+break over finished computing
+CC ->> CM : PUT /machine-manager/computations/{id} (json)
+end break
+end loop
+
+CM ->> CP : PATCH /payments/computation/{id} (json)
+CC ->> CLo : POST /logger/computations/{id} (json)
 deactivate CC
 activate CLo
 deactivate CLo

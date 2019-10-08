@@ -9,7 +9,7 @@ activate CM
 CM --> AS : 201 {id, :List<Key>}
 deactivate CM
 
-AS --> CC : run(:Key)
+AS ->> CC : run(:Key)
 activate CC
 CC -> CM : PATCH /machine-manager/{id} (json)
 activate CM
