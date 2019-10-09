@@ -1,0 +1,359 @@
+openapi: 3.0.0
+info:
+  description: This is a simple API
+  version: "1.0.0-oas3"
+  title: Baltic API
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: launcher
+    description: Launching applications
+  - name: library
+    description: Keeping track of all applications
+  - name: machine manager
+    description: Managing all clients
+  - name: machine
+    description: Our client on machine
+  - name: payments
+    description: Keeping users finances
+  - name: logger
+    description: Logger
+  - name: auth
+    description: OAuth server
+paths:
+  /launcher/applications:
+    get:
+      tags:
+        - launcher
+      summary: searches apps in library
+      operationId: listUserApplications
+      responses:
+        '200':
+          description: applications array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+  /launcher/computations:
+    get:
+      tags:
+        - launcher
+      summary: gets all computations
+      operationId: listComputations
+      responses:
+        '200':
+          description: search results
+    post:
+      tags:
+        - launcher
+      summary: run application
+      operationId: run application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Runnable'
+      responses:
+        '200':
+          description: .
+  /library/applications:
+    get:
+      tags:
+        - library
+      summary: get all applications
+      operationId: listApplications
+      responses:
+        '200':
+          description: get all applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Artifact'
+    post:
+      tags:
+        - library
+      summary: add application
+      operationId: addApplication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Artifact'
+      responses:
+        '201':
+          description: created resource
+  /machine-manager/computations:
+    post:
+      tags:
+        - machine manager
+      summary: run computation on machine
+      operationId: runComputations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Computation'
+      responses:
+        '200':
+          description: application ran successfully
+  /machine-manager/machines:
+    get:
+      tags:
+        - machine manager
+      summary: get registered machines
+      operationId: getMachines
+      responses:
+        '200':
+          description: list of machines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Machine'
+    post:
+      tags:
+        - machine manager
+      summary: create machine
+      operationId: createMachine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Machine'
+      responses:
+        '200':
+          description: machine created successfully
+  /machine-manager/machines/{id}:
+    post:
+      tags:
+        - machine manager
+      summary: report machine metrics
+      operationId: bumpMachine
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Metrics'
+      responses:
+        '200':
+          description: metrics reported successfully
+    delete:
+      tags:
+        - machine manager
+      summary: unregister machine
+      operationId: unregisterMachine
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: machine deleted succcessfully
+  /machine/status/health:
+    get:
+      tags:
+        - machine
+      summary: get machine health
+      operationId: healthCheck
+      responses:
+        '200':
+          description: everything is OK
+        '503':
+          description: service unavailable
+  /machine/computation:
+    get:
+      tags:
+        - machine
+      summary: get current computation status
+      operationId: getComputation
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Runnable'
+    post:
+      tags:
+        - machine
+      summary: run computation on machine
+      operationId: runComputation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Computation'
+      responses:
+        '200':
+          description: application ran successfully
+    delete:
+      tags:
+        - machine
+      summary: cancel current computation
+      operationId: cancelComputation
+      responses:
+        '200':
+          description: computation canceled
+  /payments/balance:
+    get:
+      tags:
+        - payments
+      summary: get current user balance
+      operationId: getBalance
+      responses:
+        '200':
+          description: user balance
+    post:
+      tags:
+        - payments
+      summary: changes user balance
+      operationId: changeBalance
+      responses:
+        '200':
+          description: search results matching criteria
+  /logger/log:
+    post:
+      tags: 
+        - logger
+      operationId: log
+      responses:
+        '201':
+          description: Logged successfully
+  /auth/auth:
+    get:
+      tags: 
+        - auth
+      operationId: auth
+      responses:
+        '302':
+          description: Redirect to OAuth provider
+  /auth/token:
+    post:
+      tags: 
+        - auth
+      operationId: requestToken
+      responses:
+        '200':
+          description: Authorisation token (Bearer)
+servers:
+  - url: 'https://virtserver.swaggerhub.com/Velox-Digitis/baltic/1.0.0'
+components:
+  schemas:
+    Application:
+      type: object
+      required:
+        - id
+        - version
+      properties:
+        id:
+          type: string
+          example: sample-app
+        version:
+          type: integer
+          example: 3
+    ApplicationInput:
+      type: object
+      properties:
+        properties:
+          type: object
+        logger:
+          type: string
+          example: http://mylogger.com/log
+    Artifact:
+      allOf:
+          - $ref: '#/components/schemas/Application'
+      required:
+        - url
+        - schema
+      properties:
+        url:
+          type: string
+          example: library/applications/sample-app.zip
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/Field'
+        command:
+          type: string
+          example: ./run.sh
+    Field:
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+          example: name
+        type:
+          type: string
+          example: string
+    Runnable:
+      allOf:
+          - $ref: '#/components/schemas/Artifact'
+          - $ref: '#/components/schemas/ApplicationInput'
+    Computation:
+      type: object
+      required:
+        - id
+        - application
+        - input
+      properties:
+        id:
+          type: string
+          example: 9f0658ce-ea44-11e9-81b4-2a2ae2dbcce4
+        application:
+          type: string
+          example: sample-app
+        input:
+          $ref: '#/components/schemas/ApplicationInput'
+    Machine:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: basic-machine
+    Metrics:
+      type: object
+      properties:
+        cpu:
+          $ref: '#/components/schemas/MetricValue'
+        memory:
+          $ref: '#/components/schemas/MetricValue'
+        drive:
+          $ref: '#/components/schemas/MetricValue'
+        uplaod:
+          $ref: '#/components/schemas/MetricValue'
+        download:
+          $ref: '#/components/schemas/MetricValue'
+    MetricValue:
+      type: object
+      properties:
+        current:
+          type: integer
+          example:  0
+        max:
+          type: integer
+          example: 100
