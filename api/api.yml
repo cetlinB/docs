@@ -1,4 +1,5 @@
 openapi: 3.0.0
+
 info:
   description: This is a simple API
   version: "iter_1"
@@ -6,80 +7,25 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
 tags:
-- name: launcher
-  description: Launching applications
-- name: library
-  description: Keeping track of all applications
-- name: machine manager
-  description: Managing all clients
-- name: machine
-  description: Our client on machine
-- name: payments
-  description: Keeping users finances
-- name: logger
-  description: Logger
-- name: auth
-  description: OAuth server
+  - name: machine manager
+    description: Managing all clients
+  - name: machine
+    description: Our client on machine
+  - name: logger
+    description: Logger
+  - name: auth
+    description: OAuth server
+
 paths:
-  /launcher/applications:
-    get:
-      tags:
-      - launcher
-      summary: searches apps in library
-      operationId: listUserApplications
-      responses:
-        '200':
-          description: applications array
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ComputationApplication'
-  /launcher/computations:
-    get:
-      tags:
-      - launcher
-      summary: gets all computations
-      operationId: listComputations
-      responses:
-        '200':
-          description: search results
+
+  /machine-manager/launcher/computations:
     post:
       tags:
-      - launcher
-      summary: run application
-      operationId: run application
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ComputationApplication'
-      responses:
-        '200':
-          description: .
-  /library/applications:
-    get:
-      tags:
-      - library
-      summary: get all applications
-      operationId: listApplications
-      responses:
-        '200':
-          description: get all applications
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ComputationApplication'
-    post:
-      tags:
-      - library
-      summary: add application
-      operationId: addApplication
+        - machine manager
+      summary: run computation on machine
+      operationId: runComputation
       requestBody:
         required: true
         content:
@@ -87,32 +33,30 @@ paths:
             schema:
               $ref: '#/components/schemas/Runnable'
       responses:
-        '201':
-          description: created resource
-  /machine-manager/computations:
-    post:
-      tags:
-      - machine manager
-      summary: run computation on machine
-      operationId: runComputations
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Computation'
-      responses:
         '200':
           description: application ran successfully
-  /machine-manager/machines:
-    get:
+        '400':
+          description: no machine is available
+    delete:
       tags:
-      - machine manager
-      summary: get registered machines
-      operationId: getMachines
+        - machine manager
+      summary: cancel current computation
+      operationId: cancelComputation
       responses:
         '200':
-          description: list of machines
+          description: computation canceled
+
+  /machine-manager/management/machines:
+    get:
+      tags:
+        - machine manager
+      summary: get registered machines
+      operationId: getMachines
+      security:
+        - OAuth2: [supplier]
+      responses:
+        '200':
+          description: list of machines managed by user
           content:
             application/json:
               schema:
@@ -121,30 +65,83 @@ paths:
                   $ref: '#/components/schemas/Machine'
     post:
       tags:
-      - machine manager
+        - machine manager
       summary: create machine
       operationId: createMachine
+      security:
+        - OAuth2: [supplier]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Machine'
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Machine token
+      responses:
+        '201':
+          description: machine created successfully
+        '400':
+          description: validation error
+
+  /machine-manager/management/machines/{id}:
+    get:
+      tags:
+        - machine manager
+      summary: get machine
+      operationId: getMachine
+      security:
+        - OAuth2: [supplier]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
       responses:
         '200':
-          description: machine created successfully
-  /machine-manager/machines/{id}:
+          description: machine
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Machine'
+        '404':
+          description: no such machine
+    delete:
+      tags:
+        - machine manager
+      summary: delete machine
+      operationId: deleteMachine
+      security:
+        - OAuth2: [supplier]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: machine deleted
+        '400':
+          description: validation error   
+
+  /machine-manager/machines/status/{id}:
     post:
       tags:
-      - machine manager
+        - machine manager
       summary: report machine metrics
       operationId: bumpMachine
+      security:
+        - MachineAuth: []
       parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -154,110 +151,126 @@ paths:
       responses:
         '200':
           description: metrics reported successfully
-    delete:
-      tags:
-      - machine manager
-      summary: unregister machine
-      operationId: unregisterMachine
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-      responses:
-        '200':
-          description: machine deleted succcessfully
-  /machine/status/health:
+
+  /machine/status:
     get:
       tags:
-      - machine
+        - machine
       summary: get machine health
       operationId: healthCheck
       responses:
         '200':
           description: everything is OK
-        '503':
-          description: service unavailable
+          content:
+            text/plain:
+              schema:
+                  type: string
+                  enum: [waiting, working]
+
   /machine/computation:
     get:
       tags:
-      - machine
+        - machine
       summary: get current computation status
       operationId: getComputation
       responses:
         '200':
-          description: search results matching criteria
+          description: current computation details
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Computation'
+        '404':
+          description: no computation
     post:
       tags:
-      - machine
+        - machine
       summary: run computation on machine
-      operationId: runComputation
+      operationId: runMachineComputation
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Computation'
+              $ref: '#/components/schemas/Runnable'
       responses:
-        '200':
+        '201':
           description: application ran successfully
     delete:
       tags:
-      - machine
+        - machine
       summary: cancel current computation
-      operationId: cancelComputation
+      operationId: cancelMachineComputation
       responses:
         '200':
           description: computation canceled
-  /payments/balance:
-    get:
-      tags:
-      - payments
-      summary: get current user balance
-      operationId: getBalance
-      responses:
-        '200':
-          description: user balance
+
+  /logger/machine/computation/{id}/logs:
     post:
-      tags:
-      - payments
-      summary: changes user balance
-      operationId: changeBalance
-      responses:
-        '200':
-          description: search results matching criteria
-  /logger/log:
-    post:
-      tags:
-      - logger
+      tags: 
+        - logger
       operationId: log
+      security:
+        - MachineAuth: []
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
       responses:
         '201':
           description: Logged successfully
-  /auth/auth:
+          
+  /logger/launcher/computation/{id}/logs:
     get:
-      tags:
-      - auth
-      operationId: auth
-      responses:
-        '302':
-          description: Redirect to OAuth provider
-  /auth/token:
-    post:
-      tags:
-      - auth
-      operationId: requestToken
+      tags: 
+        - logger
+      operationId: getLogs
+      security:
+        - OAuth2: [appuser]
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: from
+          schema:
+            type: string
+        - in: query
+          name: to
+          schema:
+            type: string
+        - in: query
+          name: filter
+          schema:
+            type: string
       responses:
         '200':
-          description: Authorisation token (Bearer)
+          description: Logs array
+
 servers:
-- url: 'https://virtserver.swaggerhub.com/Velox-Digitis/baltic/1.0.0'
+  - url: 'https://virtserver.swaggerhub.com/Velox-Digitis/baltic/1.0.0'
 components:
+
+  securitySchemes:
+    MachineAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://baltic.lsc/oauth/authorize
+          tokenUrl: https://baltic.lsc/oauth/token
+          scopes:
+            appuser: App user
+            supplier: Supplier
+            admin: Grants access to admin operations
+
   schemas:
     ComputationApplication:
       type: object
@@ -351,7 +364,7 @@ components:
         id:
           type: string
           example: 13234
-        supplierId:
+        supplierId: 
           type: string
           example: 12345643
         metrics:
@@ -374,7 +387,7 @@ components:
     MachineMetricValue:
       type: object
       required:
-      - max
+        - max
       properties:
         current:
           type: integer
