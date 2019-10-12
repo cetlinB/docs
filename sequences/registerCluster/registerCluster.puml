@@ -1,5 +1,7 @@
 @startuml
 
+title DEPRECATED 12.10.19, ARCHIVE VERSION
+
 actor "Supplier" as AS
 participant ":Machine Manager" as CM
 participant ":Cluster" as CC

@@ -318,6 +318,10 @@ components:
         type:
           type: string
           example: string
+        defaultValue:
+          nullable: true
+          example: null
+          description: default value when running app
     Computation:
       type: object
       required:

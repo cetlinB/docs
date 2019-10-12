@@ -1,5 +1,7 @@
 @startuml
 
+title DEPRECATED 12.10.19, ARCHIVE VERSION
+
 actor "App User" as AU
 participant ":Launcher" as CLa
 participant ":Machine Manager" as CM
