@@ -1,31 +1,31 @@
 openapi: 3.0.0
 info:
   description: This is a simple API
-  version: "1.0.0-oas3"
+  version: "iter_1"
   title: Baltic API
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
-  - name: launcher
-    description: Launching applications
-  - name: library
-    description: Keeping track of all applications
-  - name: machine manager
-    description: Managing all clients
-  - name: machine
-    description: Our client on machine
-  - name: payments
-    description: Keeping users finances
-  - name: logger
-    description: Logger
-  - name: auth
-    description: OAuth server
+- name: launcher
+  description: Launching applications
+- name: library
+  description: Keeping track of all applications
+- name: machine manager
+  description: Managing all clients
+- name: machine
+  description: Our client on machine
+- name: payments
+  description: Keeping users finances
+- name: logger
+  description: Logger
+- name: auth
+  description: OAuth server
 paths:
   /launcher/applications:
     get:
       tags:
-        - launcher
+      - launcher
       summary: searches apps in library
       operationId: listUserApplications
       responses:
@@ -36,11 +36,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Application'
+                  $ref: '#/components/schemas/ComputationApplication'
   /launcher/computations:
     get:
       tags:
-        - launcher
+      - launcher
       summary: gets all computations
       operationId: listComputations
       responses:
@@ -48,7 +48,7 @@ paths:
           description: search results
     post:
       tags:
-        - launcher
+      - launcher
       summary: run application
       operationId: run application
       requestBody:
@@ -56,14 +56,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Runnable'
+              $ref: '#/components/schemas/ComputationApplication'
       responses:
         '200':
           description: .
   /library/applications:
     get:
       tags:
-        - library
+      - library
       summary: get all applications
       operationId: listApplications
       responses:
@@ -74,10 +74,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Artifact'
+                  $ref: '#/components/schemas/ComputationApplication'
     post:
       tags:
-        - library
+      - library
       summary: add application
       operationId: addApplication
       requestBody:
@@ -85,14 +85,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Artifact'
+              $ref: '#/components/schemas/Runnable'
       responses:
         '201':
           description: created resource
   /machine-manager/computations:
     post:
       tags:
-        - machine manager
+      - machine manager
       summary: run computation on machine
       operationId: runComputations
       requestBody:
@@ -107,7 +107,7 @@ paths:
   /machine-manager/machines:
     get:
       tags:
-        - machine manager
+      - machine manager
       summary: get registered machines
       operationId: getMachines
       responses:
@@ -121,7 +121,7 @@ paths:
                   $ref: '#/components/schemas/Machine'
     post:
       tags:
-        - machine manager
+      - machine manager
       summary: create machine
       operationId: createMachine
       requestBody:
@@ -136,42 +136,42 @@ paths:
   /machine-manager/machines/{id}:
     post:
       tags:
-        - machine manager
+      - machine manager
       summary: report machine metrics
       operationId: bumpMachine
       parameters:
-        - in: path
-          name: id
-          schema:
-            type: string
-          required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Metrics'
+              $ref: '#/components/schemas/MachineMetrics'
       responses:
         '200':
           description: metrics reported successfully
     delete:
       tags:
-        - machine manager
+      - machine manager
       summary: unregister machine
       operationId: unregisterMachine
       parameters:
-        - in: path
-          name: id
-          schema:
-            type: string
-          required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
       responses:
         '200':
           description: machine deleted succcessfully
   /machine/status/health:
     get:
       tags:
-        - machine
+      - machine
       summary: get machine health
       operationId: healthCheck
       responses:
@@ -182,7 +182,7 @@ paths:
   /machine/computation:
     get:
       tags:
-        - machine
+      - machine
       summary: get current computation status
       operationId: getComputation
       responses:
@@ -191,10 +191,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Runnable'
+                $ref: '#/components/schemas/Computation'
     post:
       tags:
-        - machine
+      - machine
       summary: run computation on machine
       operationId: runComputation
       requestBody:
@@ -208,7 +208,7 @@ paths:
           description: application ran successfully
     delete:
       tags:
-        - machine
+      - machine
       summary: cancel current computation
       operationId: cancelComputation
       responses:
@@ -217,7 +217,7 @@ paths:
   /payments/balance:
     get:
       tags:
-        - payments
+      - payments
       summary: get current user balance
       operationId: getBalance
       responses:
@@ -225,7 +225,7 @@ paths:
           description: user balance
     post:
       tags:
-        - payments
+      - payments
       summary: changes user balance
       operationId: changeBalance
       responses:
@@ -233,45 +233,51 @@ paths:
           description: search results matching criteria
   /logger/log:
     post:
-      tags: 
-        - logger
+      tags:
+      - logger
       operationId: log
       responses:
         '201':
           description: Logged successfully
   /auth/auth:
     get:
-      tags: 
-        - auth
+      tags:
+      - auth
       operationId: auth
       responses:
         '302':
           description: Redirect to OAuth provider
   /auth/token:
     post:
-      tags: 
-        - auth
+      tags:
+      - auth
       operationId: requestToken
       responses:
         '200':
           description: Authorisation token (Bearer)
 servers:
-  - url: 'https://virtserver.swaggerhub.com/Velox-Digitis/baltic/1.0.0'
+- url: 'https://virtserver.swaggerhub.com/Velox-Digitis/baltic/1.0.0'
 components:
   schemas:
-    Application:
+    ComputationApplication:
       type: object
       required:
-        - id
-        - version
+      - id
+      - name
       properties:
         id:
           type: string
-          example: sample-app
-        version:
-          type: integer
-          example: 3
-    ApplicationInput:
+          example: 3142
+        name:
+          type: string
+          example: SuperApp
+        description:
+          type: string
+          example: This app allows multiplying large matrices
+        icon:
+          type: string
+          example: https://imgur.com/exapmle
+    ComputationApplicationInput:
       type: object
       properties:
         properties:
@@ -279,28 +285,32 @@ components:
         logger:
           type: string
           example: http://mylogger.com/log
-    Artifact:
-      allOf:
-          - $ref: '#/components/schemas/Application'
+    Runnable:
       required:
-        - url
-        - schema
+      - application
+      - url
+      - schema
       properties:
+        application:
+          $ref: '#/components/schemas/ComputationApplication'
+        version:
+          type: string
+          example: 1.2.3-beta.4
         url:
           type: string
           example: library/applications/sample-app.zip
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/Field'
+            $ref: '#/components/schemas/RunnableField'
         command:
           type: string
           example: ./run.sh
-    Field:
+    RunnableField:
       type: object
       required:
-        - name
-        - type
+      - name
+      - type
       properties:
         name:
           type: string
@@ -308,48 +318,59 @@ components:
         type:
           type: string
           example: string
-    Runnable:
-      allOf:
-          - $ref: '#/components/schemas/Artifact'
-          - $ref: '#/components/schemas/ApplicationInput'
     Computation:
       type: object
       required:
-        - id
-        - application
-        - input
+      - id
+      - runnable
+      - logger
+      - input
       properties:
         id:
           type: string
           example: 9f0658ce-ea44-11e9-81b4-2a2ae2dbcce4
-        application:
+        appUserId:
           type: string
-          example: sample-app
+          example: 234565432
+        runnable:
+          $ref: '#/components/schemas/Runnable'
+        logger:
+          type: string
+          example: https://my-domain.pl/log
         input:
-          $ref: '#/components/schemas/ApplicationInput'
+          $ref: '#/components/schemas/ComputationApplicationInput'
     Machine:
       type: object
       required:
-        - name
+      - id
       properties:
-        name:
+        id:
           type: string
-          example: basic-machine
-    Metrics:
+          example: 13234
+        supplierId:
+          type: string
+          example: 12345643
+        metrics:
+          $ref: '#/components/schemas/MachineMetrics'
+    MachineMetrics:
       type: object
       properties:
-        cpu:
-          $ref: '#/components/schemas/MetricValue'
+        cpus:
+          type: array
+          items:
+            $ref: '#/components/schemas/MachineMetricValue'
+        gpus:
+          type: array
+          items:
+            $ref: '#/components/schemas/MachineMetricValue'
         memory:
-          $ref: '#/components/schemas/MetricValue'
-        drive:
-          $ref: '#/components/schemas/MetricValue'
-        uplaod:
-          $ref: '#/components/schemas/MetricValue'
-        download:
-          $ref: '#/components/schemas/MetricValue'
-    MetricValue:
+          $ref: '#/components/schemas/MachineMetricValue'
+        localStorage:
+          $ref: '#/components/schemas/MachineMetricValue'
+    MachineMetricValue:
       type: object
+      required:
+      - max
       properties:
         current:
           type: integer
