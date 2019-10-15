@@ -2,28 +2,87 @@ openapi: 3.0.0
 
 info:
   description: This is a simple API
-  version: "iter_1"
+  version: "iter_1a"
   title: Baltic API
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 
 tags:
-  - name: machine manager
-    description: Managing all clients
-  - name: machine
-    description: Our client on machine
-  - name: logger
-    description: Logger
-  - name: auth
-    description: OAuth server
+- name: launcher
+  description: Launching applications
+- name: library
+  description: Keeping track of all applications
+- name: machine manager
+  description: Managing all clients
+- name: machine
+  description: Our client on machine
+- name: logger
+  description: Logger
+- name: queue
+  description: Queue
+- name: auth
+  description: OAuth server
 
 paths:
 
+  /launcher/app-user/applications:
+    get:
+      tags:
+      - launcher
+      summary: searches apps in library
+      operationId: listUserApplications
+      responses:
+        '200':
+          description: applications array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComputationApplication'
+  /launcher/app-user/computations:
+    get:
+      tags:
+      - launcher
+      summary: gets all computations
+      operationId: listComputations
+      responses:
+        '200':
+          description: search results
+    post:
+      tags:
+      - launcher
+      summary: run application
+      operationId: run application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComputationTask'
+      responses:
+        '200':
+          description: .
+  /library/launcher/applications:
+    get:
+      tags:
+      - library
+      summary: get all applications
+      operationId: listApplications
+      responses:
+        '200':
+          description: get all applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ComputationApplication'
   /machine-manager/launcher/computations:
     post:
       tags:
-        - machine manager
+      - machine manager
       summary: run computation on machine
       operationId: runComputation
       requestBody:
@@ -31,7 +90,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Runnable'
+              $ref: '#/components/schemas/ComputationStepPackage'
       responses:
         '200':
           description: application ran successfully
@@ -39,7 +98,7 @@ paths:
           description: no machine is available
     delete:
       tags:
-        - machine manager
+      - machine manager
       summary: cancel current computation
       operationId: cancelComputation
       responses:
@@ -49,11 +108,11 @@ paths:
   /machine-manager/management/machines:
     get:
       tags:
-        - machine manager
+      - machine manager
       summary: get registered machines
       operationId: getMachines
       security:
-        - OAuth2: [supplier]
+      - OAuth2: [supplier]
       responses:
         '200':
           description: list of machines managed by user
@@ -65,21 +124,21 @@ paths:
                   $ref: '#/components/schemas/Machine'
     post:
       tags:
-        - machine manager
+      - machine manager
       summary: create machine
       operationId: createMachine
       security:
-        - OAuth2: [supplier]
+      - OAuth2: [supplier]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: Machine token
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Machine token
       responses:
         '201':
           description: machine created successfully
@@ -89,59 +148,59 @@ paths:
   /machine-manager/management/machines/{id}:
     get:
       tags:
-        - machine manager
+      - machine manager
       summary: get machine
       operationId: getMachine
       security:
-        - OAuth2: [supplier]
+      - OAuth2: [supplier]
       parameters:
-        - in: path
-          name: id
-          schema:
-            type: string
-          required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
       responses:
         '200':
           description: machine
           content:
             application/json:
               schema:
-                  $ref: '#/components/schemas/Machine'
+                $ref: '#/components/schemas/Machine'
         '404':
           description: no such machine
     delete:
       tags:
-        - machine manager
+      - machine manager
       summary: delete machine
       operationId: deleteMachine
       security:
-        - OAuth2: [supplier]
+      - OAuth2: [supplier]
       parameters:
-        - in: path
-          name: id
-          schema:
-            type: string
-          required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
       responses:
         '200':
           description: machine deleted
         '400':
-          description: validation error   
+          description: validation error
 
   /machine-manager/machines/status/{id}:
     post:
       tags:
-        - machine manager
+      - machine manager
       summary: report machine metrics
       operationId: bumpMachine
       security:
-        - MachineAuth: []
+      - MachineAuth: []
       parameters:
-        - in: path
-          name: id
-          schema:
-            type: string
-          required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
       requestBody:
         required: true
         content:
@@ -155,7 +214,7 @@ paths:
   /machine/status:
     get:
       tags:
-        - machine
+      - machine
       summary: get machine health
       operationId: healthCheck
       responses:
@@ -164,13 +223,13 @@ paths:
           content:
             text/plain:
               schema:
-                  type: string
-                  enum: [waiting, working]
+                type: string
+                enum: [waiting, working]
 
   /machine/computation:
     get:
       tags:
-        - machine
+      - machine
       summary: get current computation status
       operationId: getComputation
       responses:
@@ -184,7 +243,7 @@ paths:
           description: no computation
     post:
       tags:
-        - machine
+      - machine
       summary: run computation on machine
       operationId: runMachineComputation
       requestBody:
@@ -192,13 +251,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Runnable'
+              $ref: '#/components/schemas/ComputationRunnable'
       responses:
         '201':
           description: application ran successfully
     delete:
       tags:
-        - machine
+      - machine
       summary: cancel current computation
       operationId: cancelMachineComputation
       responses:
@@ -207,49 +266,109 @@ paths:
 
   /logger/machine/computation/{id}/logs:
     post:
-      tags: 
-        - logger
+      tags:
+      - logger
       operationId: log
       security:
-        - MachineAuth: []
+      - MachineAuth: []
       parameters:
-        - in: path
-          name: id
-          schema:
-            type: string
-          required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
       responses:
         '201':
           description: Logged successfully
-          
+
   /logger/launcher/computation/{id}/logs:
     get:
-      tags: 
-        - logger
+      tags:
+      - logger
       operationId: getLogs
       security:
-        - OAuth2: [appuser]
+      - OAuth2: [appuser]
       parameters:
-        - in: path
-          name: id
-          schema:
-            type: string
-          required: true
-        - in: query
-          name: from
-          schema:
-            type: string
-        - in: query
-          name: to
-          schema:
-            type: string
-        - in: query
-          name: filter
-          schema:
-            type: string
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      - in: query
+        name: from
+        schema:
+          type: string
+      - in: query
+        name: to
+        schema:
+          type: string
+      - in: query
+        name: filter
+        schema:
+          type: string
       responses:
         '200':
           description: Logs array
+
+
+  /queue/topics:
+    post:
+      tags:
+      - queue
+      operationId: createTopic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ComputationTopic'
+      responses:
+        '201':
+          description: Topic created successfully
+
+  /queue/topics/{computation}/{step}:
+    get:
+      tags:
+      - queue
+      operationId: consume
+      security:
+      - MachineAuth: []
+      parameters:
+      - in: path
+        name: computation
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: step
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Message
+        '404':
+          description: No messages
+    post:
+      tags:
+      - queue
+      operationId: produce
+      security:
+      - MachineAuth: []
+      parameters:
+      - in: path
+        name: computation
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: step
+        schema:
+          type: string
+        required: true
+      responses:
+        '201':
+          description: Created message
 
 servers:
   - url: 'https://virtserver.swaggerhub.com/Velox-Digitis/baltic/1.0.0'
@@ -272,6 +391,27 @@ components:
             admin: Grants access to admin operations
 
   schemas:
+    ComputationTask:
+      type: object
+      required:
+        - id
+        - name
+        - userId
+        - application
+      properties:
+        id:
+          type: string
+          example: 3214
+        userId:
+          type: string
+          example: 23425
+        name:
+          type: string
+          example: My computation
+        application:
+          $ref: '#/components/schemas/ComputationApplication'
+        input:
+          $ref: '#/components/schemas/ComputationInput'
     ComputationApplication:
       type: object
       required:
@@ -290,7 +430,7 @@ components:
         icon:
           type: string
           example: https://imgur.com/exapmle
-    ComputationApplicationInput:
+    ComputationInput:
       type: object
       properties:
         properties:
@@ -298,28 +438,35 @@ components:
         logger:
           type: string
           example: http://mylogger.com/log
-    Runnable:
+    ComputationStepPackage:
       required:
-      - application
-      - url
       - schema
+      - computationSteps
       properties:
-        application:
-          $ref: '#/components/schemas/ComputationApplication'
+        computationSteps:
+          $ref: '#/components/schemas/ComputationStep'
         version:
           type: string
           example: 1.2.3-beta.4
-        url:
-          type: string
-          example: library/applications/sample-app.zip
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/RunnableField'
+            $ref: '#/components/schemas/ComputationStepParam'
         command:
           type: string
           example: ./run.sh
-    RunnableField:
+    ComputationStep:
+      required:
+        - applicationId
+        - arfifactUrl
+      properties:
+        applicationId:
+          type: string
+          example: 2135144
+        artifactUrl:
+          type: string
+          example: library/applications/sample-app.zip
+    ComputationStepParam:
       type: object
       required:
       - name
@@ -335,6 +482,21 @@ components:
           nullable: true
           example: null
           description: default value when running app
+    ComputationRunnable:
+      type: object
+      required:
+        - id
+        - computationStep
+      properties:
+        id:
+          type: string
+          example: 24352
+        computationStep:
+          $ref: '#/components/schemas/ComputationStep'
+        topic:
+          $ref: '#/components/schemas/ComputationTopic'
+        previousTopic:
+          $ref: '#/components/schemas/ComputationTopic'
     Computation:
       type: object
       required:
@@ -350,12 +512,12 @@ components:
           type: string
           example: 234565432
         runnable:
-          $ref: '#/components/schemas/Runnable'
+          $ref: '#/components/schemas/ComputationStepPackage'
         logger:
           type: string
           example: https://my-domain.pl/log
         input:
-          $ref: '#/components/schemas/ComputationApplicationInput'
+          $ref: '#/components/schemas/ComputationInput'
     Machine:
       type: object
       required:
@@ -395,3 +557,15 @@ components:
         max:
           type: integer
           example: 100
+    ComputationTopic:
+      type: object
+      required:
+      - computation
+      - step
+      properties:
+        computation:
+          type: string
+          example: computation1
+        step:
+          type: string
+          example: step1
