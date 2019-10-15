@@ -11,6 +11,10 @@
 8. Launcher akceptuje wprowadzone dane
 9. Launcher tworzy i dodaje CT do listy App Usera
 
-### Scenariusz alternatywny
- 8. Launcher odrzuca wprowadzone dane
- 9. Launcher wyświetla komunikat o niepoprawnych danych <<*screen*>>
+### Scenariusz alternatywny I
+8. Launcher odrzuca wprowadzone dane
+9. Launcher wyświetla komunikat o niepoprawnych danych <<*screen*>>
+
+### Scenariusz alternatywny II
+7. App User wybiera opcję "Anuluj" <<*trigger*>>
+8. Launcher wyświetla listę aplikacji <<*screen*>>
