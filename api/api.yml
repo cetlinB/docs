@@ -31,7 +31,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Runnable'
+              $ref: '#/components/schemas/ComputationStepPackage'
       responses:
         '200':
           description: application ran successfully
@@ -192,7 +192,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Runnable'
+              $ref: '#/components/schemas/ComputationStepPackage'
       responses:
         '201':
           description: application ran successfully
@@ -290,7 +290,7 @@ components:
         icon:
           type: string
           example: https://imgur.com/exapmle
-    ComputationApplicationInput:
+    ComputationInput:
       type: object
       properties:
         properties:
@@ -298,28 +298,35 @@ components:
         logger:
           type: string
           example: http://mylogger.com/log
-    Runnable:
+    ComputationStepPackage:
       required:
-      - application
-      - url
       - schema
+      - computationSteps
       properties:
-        application:
-          $ref: '#/components/schemas/ComputationApplication'
+        computationSteps:
+          $ref: '#/components/schemas/ComputationStep'
         version:
           type: string
           example: 1.2.3-beta.4
-        url:
-          type: string
-          example: library/applications/sample-app.zip
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/RunnableField'
+            $ref: '#/components/schemas/ComputationStepParam'
         command:
           type: string
           example: ./run.sh
-    RunnableField:
+    ComputationStep:
+      required:
+        - applicationId
+        - arfifactUrl
+      properties:
+        applicationId:
+          type: string
+          example: 2135144
+        artifactUrl:
+          type: string
+          example: library/applications/sample-app.zip
+    ComputationStepParam:
       type: object
       required:
       - name
@@ -350,12 +357,12 @@ components:
           type: string
           example: 234565432
         runnable:
-          $ref: '#/components/schemas/Runnable'
+          $ref: '#/components/schemas/ComputationStepPackage'
         logger:
           type: string
           example: https://my-domain.pl/log
         input:
-          $ref: '#/components/schemas/ComputationApplicationInput'
+          $ref: '#/components/schemas/ComputationInput'
     Machine:
       type: object
       required:
