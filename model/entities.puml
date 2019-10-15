@@ -7,6 +7,8 @@
     class ComputationStep
     class ComputationStepPackage
     class ComputationStepParam
+    class ComputationRunnable
+    class ComputationTopic
     class Computation
     class Machine
     class MachineMetrics
@@ -15,9 +17,11 @@
     ComputationTask *-- ComputationApplication
     ComputationTask o-- ComputationInput
     ComputationInput ..> ComputationApplication
-    ComputationStepPackage *- "1..*" ComputationStep
+    ComputationStepPackage *-- "1..*" ComputationStep
     ComputationStep o-- "0..*" ComputationStepParam
     ComputationStep ..> ComputationApplication
+    ComputationRunnable *-- "1" ComputationStep
+    ComputationRunnable o-- ComputationTopic
     Computation *-- "1"ComputationStepPackage
     Computation *-- "1" ComputationInput
     Machine o-- MachineMetrics

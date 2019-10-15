@@ -2,10 +2,6 @@
 
 skinparam componentStyle uml2
 
-skinparam actor {
-    BackgroundColor<<Machine>> Brown
-}
-
 actor "App User" as AU
 actor Developer as AD
 actor Supplier as AS
@@ -33,13 +29,15 @@ interface "/payments/launcher/" as ICPCLa
 interface "/payments/machine-manager/" as ICPCM
 interface "/library/dev/" as ICLiAD
 interface "/machine-manager/management/" as ICMAS
-interface "/launcher/user/" as ICLaAU
+interface "/launcher/app-user/" as ICLaAU
 interface "/machine/manager/" as ICMaCM
-interface "/queue/manager/" as ICQCM
-interface "/queue/machine/" as ICQCMa
+interface "/queue/" as ICQ
+interface "/auth/" as ICA
 
-AD -ri-> ICLiAD
-ICLiAD -ri- CLi
+CA -do- ICA
+
+AD -do-> ICLiAD
+ICLiAD -do- CLi
 
 AS -up-> ICMAS
 ICMAS -up- CM
@@ -76,9 +74,8 @@ ICLoCLa -do- CLo
 CLo -do- ICLoCMa
 ICLoCMa <-do- CMa
 
-CQ -up- ICQCM
-CQ -up- ICQCMa
-CM -do-> ICQCM
-CMa -do-( ICQCMa
+CQ -up- ICQ
+CM -do-> ICQ
+CMa -do-( ICQ
 
 @enduml
