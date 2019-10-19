@@ -1,6 +1,6 @@
 @startuml
 
-skinparam componentStyle uml2
+!include https://raw.githubusercontent.com/PatrykCholewa/PlantUML-utils/master/utils.iuml
 
 actor "App User" as AU
 actor Developer as AD
@@ -8,11 +8,16 @@ actor Supplier as AS
 actor Administrator as AA
 
 AA -le-|> AU
+AA -up-|> AD
+AA -do-|> AS
 
 component Launcher as CLa
+component "Launcher UI" as CLaU
 component Library as CLi
+component "Library UI" as CLiU
 component Logger as CLo
 component "Machine Manager" as CM
+component "Machine Manager UI" as CMU
 component Payments as CP
 component Machine as CMa
 component "OAuth Server" as CA
@@ -21,8 +26,6 @@ component Queue as CQ
 interface "/logger/launcher/" as ICLoCLa
 interface "/logger/machine/" as ICLoCMa
 interface "/machine-manager/machines/" as ICMCMa
-interface "/library/admin/" as ICLiAA
-interface "/machine-manager/admin/" as ICMAA
 interface "/machine-manager/launcher/" as ICMCLa
 interface "/library/launcher/" as ICLiCLa
 interface "/payments/launcher/" as ICPCLa
@@ -36,16 +39,19 @@ interface "/auth/" as ICA
 
 CA -do- ICA
 
-AD -do-> ICLiAD
-ICLiAD -do- CLi
+AD -le-> CLiU
+CLiU -le-( ICLiAD
+ICLiAD -le- CLi
 
-AS -up-> ICMAS
-ICMAS -up- CM
+AS -up-> CMU
+CMU -up-( ICMAS
+ICMAS -le- CM
 
-AU -le-> ICLaAU
+AU -le-> CLaU
+CLaU -le-( ICLaAU
 ICLaAU -le- CLa
 
-CLi -do- ICLiCLa
+CLi -le- ICLiCLa
 ICLiCLa )-do- CLa
 
 CLa -do-( ICMCLa
@@ -56,15 +62,10 @@ ICMCMa )-do- CMa
 CM -do-( ICMaCM
 ICMaCM -do- CMa
 
-CMa <-ri- AS
+CMa <-do- AS
 
-CLi -do- ICLiAA
-AA -up-> ICLiAA
-CM --up- ICMAA
-AA -do-> ICMAA
-
-CP -do- ICPCLa
-ICPCLa )-do- CLa
+CP -ri- ICPCLa
+ICPCLa )-ri- CLa
 
 CP -do- ICPCM
 CM -up-( ICPCM
@@ -74,8 +75,8 @@ ICLoCLa -do- CLo
 CLo -do- ICLoCMa
 ICLoCMa <-do- CMa
 
-CQ -up- ICQ
-CM -do-> ICQ
-CMa -do-( ICQ
+CQ -le- ICQ
+CM -do-( ICQ
+CMa -ri-( ICQ
 
 @enduml
