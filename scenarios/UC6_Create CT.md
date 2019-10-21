@@ -1,18 +1,18 @@
 ## Scenariusz do przypadku użycia UC6: Create CT
 
 ### Scenariusz główny
-1. App User wybiera opcję "Create Computation Task" <<*trigger*>>
-2. Launcher pobiera z Library listę danych aplikacji App Usera <<*data*>>
-3. Launcher wyświetla listę aplikacji <<*screen*>>
-4. App User wybiera aplikację w listy <<*trigger*>>
-5. Launcher wyświetla widok tworzenia CT <<*screen*>>
-6. App User wypełnia dane CT
-7. App User wybiera opcję "Create" <<*trigger*>>
-8. Launcher akceptuje wprowadzone dane
-9. Launcher tworzy i dodaje CT do listy App Usera
+1. App User wybiera aplikację z listy w Computation Cockpit <<*trigger*>>
+2. Launcher wyświetla szczegóły aplikacji <<*screen*>>
+3. App User wybiera opcję "Create CT" <<*trigger*>>
+4. Launcher wyświetla formularz tworzenia CT <<*screen*>>
+5. App User wypełnia formularz tworzenia CT <<*data*>>
+6. App User wybiera opcję "Create" <<*trigger*>>
+7. Launcher akceptuje wprowadzone dane <<*validate*>>
+8. Launcher tworzy CT <<*action*>>
+9. Launcher dodaje CT do listy App Usera <<*action*>>
 
 ### Scenariusz alternatywny I
-8. Launcher odrzuca wprowadzone dane
+8. Launcher odrzuca wprowadzone dane <<*validate*>>
 9. Launcher wyświetla komunikat o niepoprawnych danych <<*screen*>>
 
 ### Scenariusz alternatywny II
