@@ -69,7 +69,22 @@ paths:
               $ref: '#/components/schemas/ComputationTask'
       responses:
         '200':
-          description: .
+          description: Application ran successfully
+  /launcher/app-user/computations/{id}:
+    delete:
+      tags: 
+      - launcher
+      summary: stopComputation
+      operationId: stopComputatuin
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: computation stopped
   /library/launcher/applications:
     get:
       tags:
@@ -84,6 +99,25 @@ paths:
               schema:
                 type: array
                 items:
+                  $ref: '#/components/schemas/ComputationApplication'
+  /library/launcher/applications/{id}:
+    get:
+      tags:
+      - library
+      summary: get application
+      operationId: getApplication
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: application with id
+          content:
+            application/json:
+              schema:
                   $ref: '#/components/schemas/ComputationApplication'
   /machine-manager/launcher/computations:
     post:
@@ -102,11 +136,18 @@ paths:
           description: application ran successfully
         '400':
           description: no machine is available
+  /machine-manager/launcher/computations/{id}:
     delete:
       tags:
       - machine manager
-      summary: cancel current computation
+      summary: cancel computation
       operationId: cancelComputation
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
       responses:
         '200':
           description: computation canceled
